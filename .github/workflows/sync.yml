@@ -24,7 +24,7 @@ jobs:
 
       - name: Checkout BiliXWhite/litematica-printer
         run: |
-          git clone --branch origin-master-kotlin-dsl-dev https://github.com/BiliXWhite/litematica-printer.git ./origin-litematica-printer
+          git clone --branch master-kotlin-dsl-dev https://github.com/BiliXWhite/litematica-printer.git ./origin-litematica-printer
 
       - name: Get latest short hash from upstream
         working-directory: ./origin-litematica-printer
