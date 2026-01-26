@@ -56,12 +56,14 @@ jobs:
           git push --force origin FETCH_HEAD:refs/heads/origin-master-kotlin-dsl-dev
 
       - name: Setup Java
+        if: steps.checker.outputs.should_run == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
       - name: Cache Gradle dependencies (public caches)
+        if: steps.checker.outputs.should_run == 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -76,10 +78,10 @@ jobs:
 
       - name: make gradle wrapper executable
         if: steps.checker.outputs.should_run == 'true'
-        working-directory: ./celeritas
+        working-directory: ./origin-litematica-printer
         run: chmod +x ./gradlew
 
       - name: Build from upstream
         if: steps.checker.outputs.should_run == 'true'
-        working-directory: ./celeritas
+        working-directory: ./origin-litematica-printer
         run: ./gradlew :fabricWrapper:build --stacktrace
