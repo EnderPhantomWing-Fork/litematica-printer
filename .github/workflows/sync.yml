@@ -1,0 +1,59 @@
+name: Sync
+
+on:
+  workflow_dispatch:
+  schedule: #每四小时更新一次
+    - cron: "0 0 * * *"
+    - cron: "0 4 * * *"
+    - cron: "0 8 * * *"
+    - cron: "0 12 * * *"
+    - cron: "0 16 * * *"
+    - cron: "0 20 * * *"
+
+jobs:
+  check:
+    outputs:
+      should_run: ${{ steps.checker.outputs.should_run }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Checkout BiliXWhite/litematica-printer
+        run: |
+          git clone --branch origin-master-kotlin-dsl-dev https://github.com/BiliXWhite/litematica-printer.git ./origin-litematica-printer
+
+      - name: Get latest short hash from upstream
+        working-directory: ./origin-litematica-printer
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Get previous hash from storage file
+        run: echo "PREVIOUS_HASH=$(cat ./latest_commit)" >> $GITHUB_ENV
+
+      - name: Check if new commits appear
+        id: checker
+        run: |
+          if [[ "${{ env.COMMIT_HASH }}" == "${{ env.PREVIOUS_HASH }}" ]]
+          then
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Force sync upstream to EnderPhantomWing's fork repository 'origin-master-kotlin-dsl-dev' branch
+        if: steps.checker.outputs.should_run == 'true'
+        run: |
+          echo "Syncing remote upstream to EnderPhantomWing's fork repository..."
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            
+          git fetch https://github.com/BiliXWhite/litematica-printer.git origin-master-kotlin-dsl-dev
+            
+          git push --force origin FETCH_HEAD:refs/heads/origin-master-kotlin-dsl-dev
+
+      - name: Build from upstream
+        uses: ./.github/workflows/build.yml
