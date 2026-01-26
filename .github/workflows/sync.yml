@@ -51,7 +51,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
             
-          git fetch https://github.com/BiliXWhite/litematica-printer.git origin-master-kotlin-dsl-dev
+          git fetch https://github.com/BiliXWhite/litematica-printer.git master-kotlin-dsl-dev
             
           git push --force origin FETCH_HEAD:refs/heads/origin-master-kotlin-dsl-dev
 
