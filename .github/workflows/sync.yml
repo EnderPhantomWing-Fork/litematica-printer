@@ -43,6 +43,10 @@ jobs:
             echo "should_run=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Update hash storage
+        if: steps.checker.outputs.should_run == 'true'
+        run: echo $COMMIT_HASH > ./latest_commit
+
       - name: Force sync upstream to EnderPhantomWing's fork repository 'origin-master-kotlin-dsl-dev' branch
         if: steps.checker.outputs.should_run == 'true'
         run: |
